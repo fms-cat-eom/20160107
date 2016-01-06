@@ -296,14 +296,14 @@
   let ready = false;
 
 	document.getElementById( 'button' ).addEventListener( 'click', function() {
-    if ( ready ) {
+    if ( ready && frame === 0 ) {
 			prepare();
       update();
     }
   } );
 
 	document.getElementById( 'button2' ).addEventListener( 'click', function() {
-    if ( ready ) {
+    if ( ready && frame === 0 ) {
 			blurStep = 1;
 			dofStep = 1;
 			prepare();
