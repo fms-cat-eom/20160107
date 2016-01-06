@@ -326,7 +326,7 @@
 				'tetrarender.frag',
 				'blur.frag'
 			].map( function( _name ) {
-				requestText( '../shader/' + _name, function( _text ) {
+				requestText( './shader/' + _name, function( _text ) {
 					shader[ _name ] = _text;
 					_step();
 				} );
