@@ -10,6 +10,8 @@
 	let tetraCount = tetraCountSqrt * tetraCountSqrt;
 	let blurStep = 10;
 	let dofStep = 6;
+	let randomTextureWidth = 256;
+	let randomTextureHeight = 256;
 
 	// ------
 
@@ -17,78 +19,79 @@
 	let gl = canvas.getContext( 'webgl' ) || canvas.getContext( 'experimental-webgl' );
 	let glCat = new GLCat( gl );
 
-  // ------
+	// ------
 
-  let vbo = {};
-  vbo.quad = glCat.createVertexbuffer( [ -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0 ] );
-	vbo.cube = glCat.createVertexbuffer( ( function() {
-		let a = [];
-		for ( let iy = 0; iy < cubeCountSqrt; iy ++ ) {
-			for ( let ix = 0; ix < cubeCountSqrt; ix ++ ) {
-				for ( let iz = 0; iz < 36; iz ++ ) {
-					a.push( ix );
-					a.push( iy );
-					a.push( iz );
-				}
-			}
-		}
-		return a;
-	} )() );
-	vbo.tetra = glCat.createVertexbuffer( ( function() {
-		let a = [];
-		for ( let iy = 0; iy < tetraCountSqrt; iy ++ ) {
-			for ( let ix = 0; ix < tetraCountSqrt; ix ++ ) {
-				for ( let iz = 0; iz < 12; iz ++ ) {
-					a.push( ix );
-					a.push( iy );
-					a.push( iz );
-				}
-			}
-		}
-		return a;
-	} )() );
-
-  // ------
-
-  let framebuffer = {};
-  framebuffer.cubeGpgpu = glCat.createFloatFramebuffer( cubeCountSqrt * 2, cubeCountSqrt );
-  framebuffer.cubeGpgpuReturn = glCat.createFloatFramebuffer( cubeCountSqrt * 2, cubeCountSqrt );
-  framebuffer.tetraGpgpu = glCat.createFloatFramebuffer( tetraCountSqrt * 4, tetraCountSqrt );
-  framebuffer.tetraGpgpuReturn = glCat.createFloatFramebuffer( tetraCountSqrt * 4, tetraCountSqrt );
-	framebuffer.render = glCat.createFloatFramebuffer( canvas.width, canvas.height );
-	framebuffer.post = glCat.createFloatFramebuffer( canvas.width, canvas.height );
-	framebuffer.blur = glCat.createFloatFramebuffer( canvas.width, canvas.height );
-  framebuffer.blurReturn = glCat.createFloatFramebuffer( canvas.width, canvas.height );
-
-  // ------
-
-  let texture = {};
-	let randomTextureWidth = 256;
-	let randomTextureHeight = 256;
-  texture.random = glCat.createTexture();
-	glCat.setTextureFromFloatArray( texture.random, randomTextureWidth, randomTextureHeight, ( function() {
-		let a = [];
-		for ( let i = 0; i < randomTextureWidth * randomTextureHeight * 4; i ++ ) {
-			a.push( Math.random() );
-		}
-		return a;
-	} )() );
-  texture.cube = glCat.createTexture();
-  glCat.setTextureFromFloatArray( texture.cube, 2, 36, cubeVertices() );
-	texture.tetra = glCat.createTexture();
-	glCat.setTextureFromFloatArray( texture.tetra, 2, 12, tetraVertices() );
-
-  // ------
-
-  let shader = {};
-
-  // ------
-
+	let vbo = {};
+	let framebuffer = {};
+	let texture = {};
+	let shader = {};
   let program = {};
 
-  // ------
+	// ------
 
 	let frame = 0;
+
+  // ------
+
+	var prepare = function() {
+
+	  vbo.quad = glCat.createVertexbuffer( [ -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0 ] );
+		vbo.cube = glCat.createVertexbuffer( ( function() {
+			let a = [];
+			for ( let iy = 0; iy < cubeCountSqrt; iy ++ ) {
+				for ( let ix = 0; ix < cubeCountSqrt; ix ++ ) {
+					for ( let iz = 0; iz < 36; iz ++ ) {
+						a.push( ix );
+						a.push( iy );
+						a.push( iz );
+					}
+				}
+			}
+			return a;
+		} )() );
+		vbo.tetra = glCat.createVertexbuffer( ( function() {
+			let a = [];
+			for ( let iy = 0; iy < tetraCountSqrt; iy ++ ) {
+				for ( let ix = 0; ix < tetraCountSqrt; ix ++ ) {
+					for ( let iz = 0; iz < 12; iz ++ ) {
+						a.push( ix );
+						a.push( iy );
+						a.push( iz );
+					}
+				}
+			}
+			return a;
+		} )() );
+
+	  // ------
+
+	  framebuffer.cubeGpgpu = glCat.createFloatFramebuffer( cubeCountSqrt * 2, cubeCountSqrt );
+	  framebuffer.cubeGpgpuReturn = glCat.createFloatFramebuffer( cubeCountSqrt * 2, cubeCountSqrt );
+	  framebuffer.tetraGpgpu = glCat.createFloatFramebuffer( tetraCountSqrt * 4, tetraCountSqrt );
+	  framebuffer.tetraGpgpuReturn = glCat.createFloatFramebuffer( tetraCountSqrt * 4, tetraCountSqrt );
+		framebuffer.render = glCat.createFloatFramebuffer( canvas.width, canvas.height );
+		framebuffer.post = glCat.createFloatFramebuffer( canvas.width, canvas.height );
+		framebuffer.blur = glCat.createFloatFramebuffer( canvas.width, canvas.height );
+	  framebuffer.blurReturn = glCat.createFloatFramebuffer( canvas.width, canvas.height );
+
+	  // ------
+
+	  texture.random = glCat.createTexture();
+		glCat.setTextureFromFloatArray( texture.random, randomTextureWidth, randomTextureHeight, ( function() {
+			let a = [];
+			for ( let i = 0; i < randomTextureWidth * randomTextureHeight * 4; i ++ ) {
+				a.push( Math.random() );
+			}
+			return a;
+		} )() );
+	  texture.cube = glCat.createTexture();
+	  glCat.setTextureFromFloatArray( texture.cube, 2, 36, cubeVertices() );
+		texture.tetra = glCat.createTexture();
+		glCat.setTextureFromFloatArray( texture.tetra, 2, 12, tetraVertices() );
+
+	};
+
+  // ------
 
   let update = function() {
 
@@ -218,24 +221,6 @@
 		      gl.drawArrays( gl.TRIANGLES, 0, vbo.tetra.length / 3.0 );
 		    }
 
-		    { // postfx
-		      glCat.useProgram( program.post );
-		      gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer.post );
-		      gl.viewport( 0, 0, canvas.width, canvas.height );
-
-		      glCat.clear();
-		      gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
-
-		      glCat.attribute( 'position', vbo.quad, 3 );
-
-		      glCat.uniform1f( 'time', time );
-		      glCat.uniform2fv( 'resolution', [ canvas.width, canvas.height ] );
-
-					glCat.uniformTexture( 'renderTexture', framebuffer.render.texture, 0 );
-
-		      gl.drawArrays( gl.TRIANGLES, 0, vbo.quad.length / 3.0 );
-		    }
-
 				{ // blur
 		      glCat.useProgram( program.blur );
 		      gl.bindFramebuffer( gl.FRAMEBUFFER, framebuffer.blur );
@@ -250,7 +235,7 @@
 					glCat.uniform1f( 'add', 1.0 / blurStep / dofStep * 1.2 );
 		      glCat.uniform2fv( 'resolution', [ canvas.width, canvas.height ] );
 
-		      glCat.uniformTexture( 'postTexture', framebuffer.post.texture, 0 );
+		      glCat.uniformTexture( 'postTexture', framebuffer.render.texture, 0 );
 					glCat.uniformTexture( 'blurTexture', framebuffer.blurReturn.texture, 1 );
 
 		      gl.drawArrays( gl.TRIANGLES, 0, vbo.quad.length / 3.0 );
@@ -310,8 +295,18 @@
 
   let ready = false;
 
-  document.getElementById( 'button' ).addEventListener( 'click', function() {
+	document.getElementById( 'button' ).addEventListener( 'click', function() {
     if ( ready ) {
+			prepare();
+      update();
+    }
+  } );
+
+	document.getElementById( 'button2' ).addEventListener( 'click', function() {
+    if ( ready ) {
+			blurStep = 1;
+			dofStep = 1;
+			prepare();
       update();
     }
   } );
@@ -329,7 +324,6 @@
 				'tetragpgpu.frag',
 				'tetrarender.vert',
 				'tetrarender.frag',
-				'post.frag',
 				'blur.frag'
 			].map( function( _name ) {
 				requestText( '../shader/' + _name, function( _text ) {
@@ -340,13 +334,12 @@
 
 		},
 
-    10: function( _step ) {
+    9: function( _step ) {
 
       program.cubeGpgpu = glCat.createProgram( shader[ 'plane.vert' ], shader[ 'cubegpgpu.frag' ] );
 			program.cubeRender = glCat.createProgram( shader[ 'cuberender.vert' ], shader[ 'cuberender.frag' ] );
 			program.tetraGpgpu = glCat.createProgram( shader[ 'plane.vert' ], shader[ 'tetragpgpu.frag' ] );
 			program.tetraRender = glCat.createProgram( shader[ 'tetrarender.vert' ], shader[ 'tetrarender.frag' ] );
-			program.post = glCat.createProgram( shader[ 'plane.vert' ], shader[ 'post.frag' ] );
       program.return = glCat.createProgram( shader[ 'plane.vert' ], shader[ 'return.frag' ] );
       program.blur = glCat.createProgram( shader[ 'plane.vert' ], shader[ 'blur.frag' ] );
 
