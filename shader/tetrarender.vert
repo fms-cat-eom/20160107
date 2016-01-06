@@ -42,10 +42,10 @@ mat2 rotate( float _theta ) {
 }
 
 void main() {
-  vec3 pos = texture2D( particleTexture, ( uv.xy * vec2( 2.0, 1.0 ) + vec2( 0.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
-  vec3 vel = texture2D( particleTexture, ( uv.xy * vec2( 2.0, 1.0 ) + vec2( 1.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
-  vec3 rot = texture2D( particleTexture, ( uv.xy * vec2( 2.0, 1.0 ) + vec2( 2.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
-  vec3 vrot = texture2D( particleTexture, ( uv.xy * vec2( 2.0, 1.0 ) + vec2( 3.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
+  vec3 pos = texture2D( particleTexture, ( uv.xy * vec2( 4.0, 1.0 ) + vec2( 0.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
+  vec3 vel = texture2D( particleTexture, ( uv.xy * vec2( 4.0, 1.0 ) + vec2( 1.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
+  vec3 rot = texture2D( particleTexture, ( uv.xy * vec2( 4.0, 1.0 ) + vec2( 2.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
+  vec3 vrot = texture2D( particleTexture, ( uv.xy * vec2( 4.0, 1.0 ) + vec2( 3.5, 0.5 ) ) / vec2( 4.0, 1.0 ) / tetraCountSqrt ).xyz;
 
   vec3 tetraVert = texture2D( tetraTexture, vec2( 0.5 / 2.0, uv.z / 12.0 ) ).xyz;
   tetraVert.yz = rotate( rot.x ) * tetraVert.yz;
