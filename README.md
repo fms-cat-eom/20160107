@@ -1,6 +1,12 @@
-# Everyday One Motion - 20160107 "Cube & Tetrahedron"
+# Everyday One Motion - 20160107  
 
-![](http://motions.work/img/FMS_Cat_568d190836db2.gif)
+"Cube & Tetrahedron"  
+
+![](20160107.gif)  
+
+WebGL, GPGPU Particle, Noise Particle  
+
+[Everyday One Motion](http://motions.work/motions/53)
 
 WebGL    
 パーティクル多め  
